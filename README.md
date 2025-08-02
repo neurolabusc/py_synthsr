@@ -13,9 +13,8 @@ From the source directory:
 ```bash
 # Download the model files into the package's models folder
 curl -L https://osf.io/download/jqdcm/ -o models.zip \
-  && unzip -o models.zip -d py_synthsr/models \
+  && unzip -jo models.zip -d py_synthsr/models \
   && rm models.zip
-
 # Install the package into your current Python environment
 pip install .
 
