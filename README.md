@@ -11,8 +11,15 @@ This repository provides a minimal, standalone installation of SynthSR. It remov
 From the source directory:
 
 ```bash
-curl -L https://osf.io/download/jqdcm/ -o models.zip && unzip -o models.zip && rm models.zip
+# Download the model files into the package's models folder
+curl -L https://osf.io/download/jqdcm/ -o models.zip \
+  && unzip -o models.zip -d py_synthsr/models \
+  && rm models.zip
+
+# Install the package into your current Python environment
 pip install .
+
+# Run SynthSR on an example FLAIR image
 py_synthsr --i FLAIR.nii.gz --o FLAIR2T1w.nii.gz
 ```
 

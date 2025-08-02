@@ -21,4 +21,7 @@ dependencies = [
 ]
 
 [project.scripts]
-py_synthsr = "py_synthsr:main"
+py_synthsr = "py_synthsr.cli:main"
+
+[tool.setuptools.package-data]
+"py_synthsr" = ["models/*.h5"]

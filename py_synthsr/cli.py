@@ -4,6 +4,7 @@ import os
 import sys
 import glob
 import time
+import importlib.util
 import numpy as np
 import argparse
 import nibabel as nib
@@ -65,7 +66,14 @@ def main():
     # Determine FREESURFER_HOME or fallback
     fshome = os.environ.get('FREESURFER_HOME')
     if not fshome:
-        fshome = os.path.dirname(os.path.realpath(__file__))
+        # Try to locate installed package location
+        try:
+            import py_synthsr
+            fshome = os.path.dirname(os.path.realpath(py_synthsr.__file__))
+        except ImportError:
+            # Fallback to script dir (editable installs or dev mode)
+            fshome = os.path.dirname(os.path.realpath(__file__))
+    
         print(f"FREESURFER_HOME is not set. Assuming: {fshome}")
     
     # Locate model weights
