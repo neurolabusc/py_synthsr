@@ -1,0 +1,5 @@
+numpy
+nibabel
+surfa
+scipy
+tensorflow
