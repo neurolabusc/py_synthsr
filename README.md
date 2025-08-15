@@ -24,7 +24,7 @@ py_synthsr --i FLAIR.nii.gz --o FLAIR2T1w.nii.gz
 
 ## Limitations
 
- - At the time of writing, [TensorFlow](https://pypi.org/project/tensorflow/) does not support Python versions later than 3.12.
+ - At the time of writing, [TensorFlow](https://pypi.org/project/tensorflow/) does not support Python versions later than 3.13.
  - This package includes updates to work with recent TensorFlow releases, but results may differ slightly from the original. Limited testing shows >99% of voxels are identical; for 8‑bit outputs, no voxel differed by more than 1.
 
 ## Citation
