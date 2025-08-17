@@ -4,7 +4,6 @@ import os
 import sys
 import glob
 import time
-import importlib.util
 import numpy as np
 import argparse
 import nibabel as nib
@@ -24,6 +23,15 @@ backend.set_image_data_format('channels_last')
 # ================================================================================================
 #                                         Main Entrypoint
 # ================================================================================================
+
+def batch_normalization(axis, name, tensor):
+    major, minor, patch = (int(x) for x in tf.__version__.split(".")[:3])
+    if (major, minor) <= (2, 13):
+        # Old behavior requires fused=False
+        return keras.layers.BatchNormalization(axis=axis, name=name, fused=False)(tensor)
+    else:
+        # New behavior (fused argument removed)
+        return keras.layers.BatchNormalization(axis=axis, name=name)(tensor)
 
 
 def main():
@@ -97,7 +105,7 @@ def main():
                  f"Please specify the correct model with --model or ensure it exists in {os.path.dirname(path_model)}.")
     
     print(path_model)
-
+    
     # run prediction
     predict(
         path_images=args.i,
@@ -108,7 +116,6 @@ def main():
         disable_flipping=args.disable_flipping,
         threads=args.threads
     )
-
 
 # ================================================================================================
 #                                 Prediction and Processing Utilities
@@ -552,9 +559,7 @@ def conv_enc(nb_features,
 
         if batch_norm is not None:
             name = '%s_bn_down_%d' % (prefix, level)
-            last_tensor = keras.layers.BatchNormalization(axis=batch_norm, name=name)(last_tensor)
-
-            #CR last_tensor = keras.layers.BatchNormalization(axis=batch_norm, name=name, fused=False)(last_tensor)
+            last_tensor = batch_normalization(batch_norm, name, last_tensor)
 
         # max pool if we're not at the last level
         if level < (nb_levels - 1):
@@ -614,10 +619,9 @@ def conv_dec(nb_features,
     else:
         input_tensor = input_model.input
         last_tensor = input_model.output
-        #input_shape = last_tensor.shape.as_list()[1:]
         if isinstance(last_tensor, list):
             last_tensor = last_tensor[0]
-
+        #CR input_shape = last_tensor.shape.as_list()[1:]
         input_shape = list(last_tensor.shape)[1:]
 
     # vol size info
@@ -693,8 +697,7 @@ def conv_dec(nb_features,
 
         if batch_norm is not None:
             name = '%s_bn_up_%d' % (prefix, level)
-            #CR last_tensor = keras.layers.BatchNormalization(axis=batch_norm, name=name, fused=False)(last_tensor)
-            last_tensor = keras.layers.BatchNormalization(axis=batch_norm, name=name)(last_tensor)
+            last_tensor = batch_normalization(batch_norm, name, last_tensor)
 
     # Compute likelyhood prediction (no activation yet)
     name = '%s_likelihood' % prefix
